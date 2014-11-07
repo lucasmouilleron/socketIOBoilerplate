@@ -34,6 +34,10 @@ Run
 - Open [http://localhost.com/client-master](http://localhost.com/client-master)
 - And anoter one [http://localhost.com/client-master](http://localhost.com/client-master)
 
+TODO
+----
+- JWT authentication (via middleware)
+
 Credits
 -------
 Thanks to the guys at [http://socket.io](http://socket.io)
