@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+
+    <title>socketIOBoilerplate</title>
+    <meta name="description" content="">
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width initial-scale=1.0">
+    <link rel="shortcut icon" href="assets/img/favicon.png">
+    <script src="assets/js/modernizr.js"></script>
+    <link rel="stylesheet" href="assets/css/main.css">
+
+</head>
+<body>
+
+    <!-- /////////////////////////////////////////////////////////////// -->
+    <div class="container">        
+        <div class="jumbotron">
+            <h1>socketIOBoilerplate</h1>
+            <p>Master client</p>
+        </div>
+    </div>
+
+    <!-- /////////////////////////////////////////////////////////////// -->
+    <div class="container">
+        <h2>Room ID</h2>
+        <div id="joinInForm">
+            <div class="form-group">
+                <input type="text" class="form-control" id="roomIDInput" placeholder="Entre the roomID">
+            </div>
+            <a id="submitRoomID" class="btn btn-primary">Join in !</a>
+        </div>
+
+        <div class="well hidden" id="roomIDConsole">
+            The room ID is : <strong><span id="roomID">...</span></strong>
+        </div>
+    </div>
+
+    <!-- /////////////////////////////////////////////////////////////// -->
+    <div class="container hidden" id="actions">
+        <h2>Actions</h2>
+        <a id="turnOff" class="btn btn-primary">Turn off !</a> <a id="turnOn" class="btn btn-primary">Turn on !</a> 
+    </div>
+
+    <!-- /////////////////////////////////////////////////////////////// -->
+    <script data-main="_dev/js/main" src="assets/js/require.js"></script>
+
+</body>
+</html>

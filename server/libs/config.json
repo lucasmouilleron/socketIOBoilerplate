@@ -1,0 +1,4 @@
+{
+    "socketIOPort": 3000,
+    "socketMaxMastersPerRoom": 1
+}
