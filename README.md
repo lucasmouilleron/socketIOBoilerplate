@@ -25,7 +25,8 @@ Build
 - Modify `client-master/_dev/js/libs/config.js`
 - Modify `client-slave/_dev/js/libs/config.js`
 - Modify `server/libs/config.json`
-- `cd _build && grunt build`
+- `cd client-master/_build && grunt build`
+- `cd client-slave/_build && grunt build`
 
 Run
 ---
