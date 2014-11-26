@@ -1,18 +1,23 @@
 //////////////////////////////////////////////////////////////
-var tools = require("./libs/tools");
 var config = require("./libs/config.json");
+var DEBUG = config.debug;
+var LAT_PRECISION = 0.01;
+var LONG_PRECISION = 0.01;
+
+//////////////////////////////////////////////////////////////
 var io = require("socket.io")();
+var tools = require("./libs/tools").init(DEBUG);
 
 //////////////////////////////////////////////////////////////
 var roomsSlaves = [];
+var bombs = [];
 
 //////////////////////////////////////////////////////////////
 io.on("connection", function(socket){
 	
-	var roo
-	socket.on("join-room", function (data, ack) {
+	//////////////////////////////////////////////////////////////
+	socket.on("join-room", function(data, ack) {
 		var jwt = data.jwt;
-
 		var nbClients = tools.findClientsSocketByRoomId(io, data.roomID).length;
 		if(nbClients > config.socketMaxMastersPerRoom) {
 			socket.emit("no-more-master");
@@ -34,7 +39,8 @@ io.on("connection", function(socket){
 		}
 	});
 
-	socket.on("action", function (data) {
+	//////////////////////////////////////////////////////////////
+	socket.on("action-room", function(data) {
 		// the room 0 is the socket default room
 		var room = socket.rooms[1];
 		var slaveSocket = roomsSlaves[room];
@@ -43,8 +49,42 @@ io.on("connection", function(socket){
 			socket.disconnect();
 			return;
 		}
-		slaveSocket.emit("action",data);
-		tools.info("action",data,"sent to room",room,"slave",slaveSocket.id);	
+		slaveSocket.emit("action-room",data);
+		tools.info("action",data,"sent to room",room,"slave",slaveSocket.id);
+	});
+
+	//////////////////////////////////////////////////////////////
+	socket.on("drop-bomb", function(data, ack) {
+		bombs.push({"lat":data.lat,"long":data.long,"owner":socket.id,"exploded":false});
+		tools.info("bom dropped",bombs[bombs.length-1]);
+		if(ack) ack(true);
+	});
+
+	//////////////////////////////////////////////////////////////
+	socket.on("do-i-explode", function(data, ack) {
+
+		var boomBombIndex = -1;
+		var bomb = undefined;
+		for (var i = 0; i < bombs.length; i++) {
+			bomb = bombs[i];
+			if(!bomb.exploded && bomb.owner != socket.id) {
+				if((data.lat >= bomb.lat - LAT_PRECISION && data.lat <= bomb.lat + LAT_PRECISION) && (data.long >= bomb.long - LONG_PRECISION && data.long <= bomb.long + LONG_PRECISION)) {
+					boomBombIndex = i;
+				}
+				break;
+			}
+		}
+		if(boomBombIndex != -1) {
+			bomb.exploded = true;
+			bombs[boomBombIndex] = bomb;
+			if(ack) ack({"boom":true,"owner":bomb.owner});
+			tools.info("bomb exploded","bomb index",boomBombIndex);
+			tools.debug("bombs",bombs);
+		}
+		else {
+			if(ack) ack({"boom":false});
+		}
+		
 	});
 
 });

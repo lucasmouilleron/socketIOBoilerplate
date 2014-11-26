@@ -42,7 +42,7 @@ require(["jquery", "tools", "socketio","bootstrap","config","notify-bootstrap"],
             $.notify("You joined in", "success");
             socket.emit("join-room", {"roomID":roomID,"jwt":"todo"});
 
-            socket.on("action", function(data){
+            socket.on("action-room", function(data){
                 $.notify("Action recieved", "success");
                 if(data.action === "turn-off") {
                     $("#black").hide().removeClass("hidden").fadeIn();

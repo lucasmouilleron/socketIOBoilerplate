@@ -29,65 +29,125 @@ require(["jquery", "tools", "socketio","bootstrap","config","notify-bootstrap"],
     $(function() {
 
         var roomID = undefined;
+        var socketRoom = undefined;
         var socket = undefined;
+        var lat = undefined;
+        var long = undefined;
+
+        initGeolocation();
+        initSocket();
 
         $("#turnOff").click(function() {
-            socket.emit("action", {"action":"turn-off"});
-            $.notify("Action sent", "success");
+            socketRoom.emit("action-room", {"action":"turn-off"});
+            $.notify("Action room sent", "success");
         });
 
         $("#turnOn").click(function() {
-            socket.emit("action", {"action":"turn-on"});
-            $.notify("Action sent", "success");
+            socketRoom.emit("action-room", {"action":"turn-on"});
+            $.notify("Action room sent", "success");
+        });
+
+        $("#dropBomb").click(function() {
+            if(lat != undefined && long != undefined) {
+                socket.emit("drop-bomb", {"lat":lat,"long":long}, function(ack) {
+                    $.notify("Bomb dropped", "success");
+                });
+            }
+            else {
+                $.notify("Can't drop bomb, not geolocated yet", "error");
+            }
         });
 
         var roomIDGet = tools.getQueryParams().roomID;
         if(roomIDGet !== undefined) {
             roomID = roomIDGet;
-            initSocket();
+            initSocketRoom();
         }
 
         $("#submitRoomID").click(function() {
             roomID = $("#roomIDInput").val();
-            initSocket();
+            initSocketRoom();
         });
 
         function shutdownSocket() {
             $("#joinInForm").fadeIn();
             $("#roomIDConsole").fadeOut();
             $("#actions").fadeOut();
+            $("#room-actions").fadeOut();
             $("#roomID").html("...");
-            socket = undefined;
+            socketRoom = undefined;
             roomID = undefined;
         }
 
         function initSocket() {
-            if(socket !== undefined || roomID === undefined || roomID === "") return;
+            if(socket !== undefined) return;
 
             $.notify("Joining in", "info");
             socket = io(SOCKET_IO_HOST+":"+SOCKET_IO_PORT, {"forceNew":true });
-            tools.displayMainLoader();
             socket.on("connect", function(){
+                $("#global-socket-id").html(socket.io.engine.id);
+                $("#actions").hide().removeClass("hidden").fadeIn();    
+                $.notify("You joined in", "success");
+            });
+        }
 
-                socket.emit("join-room", {"roomID":roomID,"jwt":"todo"}, function(ack) {
-                    tools.hideMainLoader();
+        function initSocketRoom() {
+            if(socketRoom !== undefined || roomID === undefined || roomID === "") return;
+
+            $.notify("Joining room "+roomID, "info");
+            socketRoom = io(SOCKET_IO_HOST+":"+SOCKET_IO_PORT, {"forceNew":true });
+            socketRoom.on("connect", function(client){
+                $("#room-socket-id").html(socketRoom.io.engine.id);
+                socketRoom.emit("join-room", {"roomID":roomID,"jwt":"todo"}, function(ack) {
                     if(ack) {
                         $("#joinInForm").fadeOut();
                         $("#roomIDConsole").hide().removeClass("hidden").fadeIn();
-                        $("#actions").hide().removeClass("hidden").fadeIn();
+                        $("#room-actions").hide().removeClass("hidden").fadeIn();
                         $("#roomID").html(roomID);
                         $.notify("You joined in", "success");
                     }
                 });
 
-                socket.on("no-more-master", function(data) {
+                socketRoom.on("no-more-master", function(data) {
                     shutdownSocket();
                     $.notify("No more masters allowed", "warn");
                 });
 
-                socket.on("disconnect", function(){});
+                socketRoom.on("disconnect", function(){});
 
             });
+        }
+
+        function initGeolocation()
+        {
+            if(navigator.geolocation)
+            {
+                $.notify("Geolocating", "warn");
+                navigator.geolocation.watchPosition(success, fail);
+            }
+            else
+            {
+                alert("Sorry, your browser does not support geolocation services.");
+            }
+
+            function success(position)
+            {
+                lat = position.coords.latitude;
+                long = position.coords.longitude;
+                $.notify("Geolocated", "success");
+                if(socket != undefined) {
+                    socket.emit("do-i-explode", {"lat":lat,"long":long}, function(ack) {
+                        if(ack.boom) {
+                            $.notify("BOOOOOMMMM !!!! - "+ack.owner, "warn");
+                        }
+                    });
+                }
+            }
+
+            function fail(a,b)
+            {
+                //alert("Geoloc error : "+a);
+            }
         }
         
     });

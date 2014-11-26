@@ -3,9 +3,15 @@ var colors = require("colors");
 var moment = require("moment");
 var fs = require("fs");
 var map = require("array-map");
+var DEBUG = false;
 
 //////////////////////////////////////////////////////////////
 module.exports = {
+
+    init: function(debug) {
+        DEBUG = debug;
+        return this;
+    },
 
     findClientsSocketByRoomId: function(io, roomId) {
         var res = []
@@ -16,6 +22,14 @@ module.exports = {
             }
         }
         return res;
+    },
+
+    debug: function() {
+        if(DEBUG) {
+            message = this.stringifyArgs(this.getArgsArray(arguments)).join(" / ");
+            message = "[DBG] "+moment().format("YYYY/MM/DD - HH:mm:ss")+" - "+message;
+            console.log(message.blue);
+        }
     },
 
     info: function() {

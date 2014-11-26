@@ -1,4 +1,5 @@
 {
+    "debug": true,
     "socketIOPort": 3000,
-    "socketMaxMastersPerRoom": 1
+    "socketMaxMastersPerRoom": 2
 }

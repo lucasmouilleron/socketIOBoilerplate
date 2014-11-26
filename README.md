@@ -11,6 +11,7 @@ Features
 Install requirements
 --------------------
 - Install NodeJS : http://nodejs.org/download
+- `sudo gem install compass`
 - `sudo npm install bower -g`
 - `sudo npm install grunt -g`
 - `sudo gem install sass`
