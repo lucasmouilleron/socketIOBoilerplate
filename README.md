@@ -1,6 +1,11 @@
 socketIOBoilerplate
 ===================
 
+A nice and simple socketIO boilerplate.
+Features a demo web multi screen web app.
+
+![Screenshot](http://grabs.lucasmouilleron.com/Screen%20Shot%202015-11-23%20at%2015.16.43.png)
+
 Features
 --------
 - A nice and simple socketIO boilerplate
